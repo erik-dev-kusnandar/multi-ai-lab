@@ -7,7 +7,7 @@ const MODELS = [
     //   { name: "Claude 3", id: "anthropic/claude-3-sonnet" },
     { name: "Gemini 3 12b", id: "google/gemma-3-12b-it:free" },
     { name: "Meta: Llama 3.2 3b", id: "meta-llama/llama-3.2-3b-instruct:free" },
-    { name: "Mistral 7B", id: "mistralai/mistral-small-3.2-24b-instruct:free" },
+    { name: "Mistral 7B", id: "mistralai/mistral-7b-instruct:free" },
     //   { name: "Grok 2", id: "xai/grok-2" },
     { name: "Qwen 3-8b", id: "qwen/qwen3-8b:free" },
     { name: "DeepSeek V3.1", id: "deepseek/deepseek-chat-v3.1:free" },
