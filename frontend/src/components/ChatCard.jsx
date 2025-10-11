@@ -10,7 +10,7 @@ import { ChevronDown } from "lucide-react";
 import dotenv from "dotenv";
 dotenv.config();
 
-const BACKEND_URL = "https://multi-ai-lab.zeabur.app";
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3030";
 
 const ChatCard = forwardRef(({ modelName, modelId, index = 0 }, ref) => {
     const [expanded, setExpanded] = useState(true);
@@ -36,7 +36,7 @@ const ChatCard = forwardRef(({ modelName, modelId, index = 0 }, ref) => {
         setLoading(true);
 
         try {
-            const res = await fetch(`${process.env.BACKEND_URL}/api/chat`, {
+            const res = await fetch(`${BACKEND_URL}/api/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ model: modelId, messages: newMessages }),
