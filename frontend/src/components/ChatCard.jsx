@@ -7,6 +7,10 @@ import React, {
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import dotenv from "dotenv";
+dotenv.config();
+
+const BACKEND_URL = "https://multi-ai-lab.zeabur.app";
 
 const ChatCard = forwardRef(({ modelName, modelId, index = 0 }, ref) => {
     const [expanded, setExpanded] = useState(true);
@@ -32,7 +36,7 @@ const ChatCard = forwardRef(({ modelName, modelId, index = 0 }, ref) => {
         setLoading(true);
 
         try {
-            const res = await fetch("http://localhost:3030/api/chat", {
+            const res = await fetch(`${process.env.BACKEND_URL}/api/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ model: modelId, messages: newMessages }),
