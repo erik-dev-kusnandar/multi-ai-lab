@@ -35,7 +35,7 @@ app.post('/api/chat', async (req, res) => {
             headers: {
                 'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
                 'Content-Type': 'application/json',
-                'HTTP-Referer': 'http://localhost:5173', // ubah nanti sesuai domain
+                'HTTP-Referer': 'https://multi-ai-lab.vercel.app/', //'http://localhost:5173', // ubah nanti sesuai domain
                 "X-Title": "Multi AI Lab",
             },
             body: JSON.stringify(
