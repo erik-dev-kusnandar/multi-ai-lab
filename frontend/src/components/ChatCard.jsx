@@ -8,7 +8,8 @@ import React, {
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3030";
+// const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3030";
+const BACKEND_URL = "https://multi-ai-lab.zeabur.app";
 
 const ChatCard = forwardRef(({ modelName, modelId, index = 0 }, ref) => {
     const [expanded, setExpanded] = useState(true);
