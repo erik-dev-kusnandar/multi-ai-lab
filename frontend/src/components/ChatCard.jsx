@@ -8,10 +8,10 @@ import React, {
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import dotenv from "dotenv";
-// dotenv.config();
+dotenv.config();
 
-// const BACKEND_URL = "https://multi-ai-lab.zeabur.app";
-const BACKEND_URL = "http://localhost:3030";
+const BACKEND_URL = "https://multi-ai-lab.zeabur.app";
+// const BACKEND_URL = "http://localhost:3030";
 
 const ChatCard = forwardRef(({ modelName, modelId, index = 0 }, ref) => {
     const [expanded, setExpanded] = useState(true);
