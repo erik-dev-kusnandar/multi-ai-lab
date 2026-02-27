@@ -5,12 +5,21 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
+
+// Robust CORS to allow external apps and Vercel
 app.use(cors({
     origin: "*",
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
 app.use(express.json());
+
+// Request logger
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
@@ -23,6 +32,11 @@ if (!OPENROUTER_API_KEY) {
 } else {
     console.log(`✅ [INFO] API Key loaded (Prefix: ${OPENROUTER_API_KEY.substring(0, 10)}..., Length: ${OPENROUTER_API_KEY.length})`);
 }
+
+// Health check for other apps
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', message: 'Multi-AI Lab API is running' });
+});
 
 app.post('/api/chat', async (req, res) => {
     const { model, messages } = req.body;
@@ -43,7 +57,7 @@ app.post('/api/chat', async (req, res) => {
             headers: {
                 'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
                 'Content-Type': 'application/json',
-                'HTTP-Referer': 'https://multi-ai-lab.vercel.app/', // Ganti dengan URL Vercel kamu
+                // 'HTTP-Referer': 'https://multi-ai-lab.vercel.app/',
                 'X-Title': 'Multi AI Lab'
             },
             body: JSON.stringify({
@@ -61,7 +75,7 @@ app.post('/api/chat', async (req, res) => {
             return res.status(response.status).json({ error: 'OpenRouter Error', details: data });
         }
 
-        // Optional: Clean up response content if needed (same as before)
+        // Clean up response content
         if (data?.choices?.[0]?.message?.content) {
             data.choices[0].message.content = data.choices[0].message.content
                 .replace(/<[^>]*>/g, "")
@@ -80,7 +94,7 @@ app.post('/api/chat', async (req, res) => {
 const port = process.env.PORT || 3030;
 app.listen(port, () => {
     console.log(`🚀 [SERVER] Backend running on port ${port}`);
-    console.log(`� [URL] http://localhost:${port}`);
+    console.log(`🔗 [URL] http://localhost:${port}`);
 });
 
 process.on("SIGINT", () => {
