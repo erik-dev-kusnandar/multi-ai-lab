@@ -3,12 +3,12 @@ import { motion } from "framer-motion";
 import ChatCard from "./components/ChatCard";
 
 const MODELS = [
-    { name: "GPT-5.1", id: "openai/gpt-5.1" },
-    { name: "Gemini 3", id: "google/gemma-3-12b-it" },
-    { name: "Llama 3.3", id: "meta-llama/llama-3.3-70b-instruct" },
-    { name: "Mistral 3", id: "mistralai/mistral-small-creative" },
-    { name: "Qwen 3.5", id: "qwen/qwen3.5-flash-02-23" },
-    { name: "Z.ai", id: "z-ai/glm-4.5" },
+    { name: "GPT-4o Mini", id: "openai/gpt-4o-mini" },
+    { name: "Gemini 2.0 Flash", id: "google/gemini-2.0-flash-001" },
+    { name: "Llama 3.1 70B", id: "meta-llama/llama-3.1-70b-instruct" },
+    { name: "Claude 3.5 Sonnet", id: "anthropic/claude-3.5-sonnet" },
+    { name: "Mistral Large", id: "mistralai/mistral-large" },
+    { name: "Qwen 2.5 72B", id: "qwen/qwen-2.5-72b-instruct" },
 ];
 
 export default function App() {

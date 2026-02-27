@@ -1,82 +1,85 @@
 import express from "express";
 import cors from "cors";
-import fetch from "node-fetch";
 import dotenv from "dotenv";
-dotenv.config();
 
+dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
+
+// Load and clean API Key
+const apiKeyRaw = process.env.OPENROUTER_API_KEY || "";
+const OPENROUTER_API_KEY = apiKeyRaw.trim().replace(/^["']|["']$/g, '');
 
 if (!OPENROUTER_API_KEY) {
-    console.warn("[WARN] OPENROUTER_API_KEY not set. Set it via env var.");
+    console.warn("⚠️ [WARN] OPENROUTER_API_KEY is missing in .env");
+} else {
+    console.log(`✅ [INFO] API Key loaded (Prefix: ${OPENROUTER_API_KEY.substring(0, 10)}..., Length: ${OPENROUTER_API_KEY.length})`);
 }
-
 
 app.post('/api/chat', async (req, res) => {
     const { model, messages } = req.body;
-    if (!model || !messages) {
-        return res.status(400).json({ error: 'invalid_request', details: 'model and messages are required' });
+
+    if (!model || !messages || !Array.isArray(messages)) {
+        return res.status(400).json({ error: 'invalid_request', details: 'model and messages (array) are required' });
     }
 
-    // Basic validation of messages
-    if (!Array.isArray(messages) || !messages.every(msg => msg.role && msg.content)) {
-        return res.status(400).json({ error: 'invalid_request', details: 'messages must be an array of {role, content}' });
+    if (!OPENROUTER_API_KEY) {
+        return res.status(500).json({ error: 'server_error', details: 'API Key not configured on server' });
     }
 
-    // Forward the request to OpenRouter
     try {
-        const resp = await fetch(OPENROUTER_URL, {
+        console.log(`🚀 [API] Calling OpenRouter for model: ${model}`);
+
+        const response = await fetch(OPENROUTER_URL, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
                 'Content-Type': 'application/json',
-                'HTTP-Referer': 'http://188.166.182.43:3000/', // ubah nanti sesuai domain
-                "X-Title": "Multi AI Lab",  //'https://multi-ai-lab.vercel.app/', //'https://multi-ai-lab.zeabur.app/',
+                'HTTP-Referer': 'https://multi-ai-lab.vercel.app/', // Ganti dengan URL Vercel kamu
+                'X-Title': 'Multi AI Lab'
             },
-            body: JSON.stringify(
-                { model, messages, temperature: 0.7, top_p: 0.9, stream: false, max_tokens: 1000 }
-            )
+            body: JSON.stringify({
+                model,
+                messages,
+                temperature: 0.7,
+                max_tokens: 1000
+            })
         });
 
+        const data = await response.json();
 
-        const data = await resp.json();
+        if (!response.ok) {
+            console.error(`❌ [ERROR] OpenRouter returned ${response.status}:`, JSON.stringify(data, null, 2));
+            return res.status(response.status).json({ error: 'OpenRouter Error', details: data });
+        }
+
+        // Optional: Clean up response content if needed (same as before)
         if (data?.choices?.[0]?.message?.content) {
             data.choices[0].message.content = data.choices[0].message.content
-                .replace(/<[^>]*>/g, "") // hapus semua markup <...>
-                .replace(/[｜▁]/g, " ")   // hapus simbol aneh unicode
+                .replace(/<[^>]*>/g, "")
+                .replace(/[｜▁]/g, " ")
                 .replace(/\s+/g, " ")
                 .trim();
         }
 
-        if (!data?.choices?.length) {
-            console.warn(`⚠️ No choices returned for model: ${model}`);
-            console.warn("Raw response:", JSON.stringify(data, null, 2));
-        }
-
-        if (!resp.ok) {
-            return res.status(resp.status).json({ error: 'OpenRouter Error:', details: data });
-        }
-
         res.json(data);
     } catch (err) {
-        console.error(err);
+        console.error("🔥 [PROXY ERROR]:", err);
         res.status(500).json({ error: 'proxy_error', details: err.message });
     }
 });
 
-
 const port = process.env.PORT || 3030;
-app.listen(port, () => console.log(`✅ Backend proxy running on http://localhost:${port}`));
+app.listen(port, () => {
+    console.log(`🚀 [SERVER] Backend running on port ${port}`);
+    console.log(`� [URL] http://localhost:${port}`);
+});
 
-function gracefulShutdown(signal) {
-    console.log(`🛑 Server received ${signal}, shutting down...`);
+process.on("SIGINT", () => {
+    console.log("🛑 Stopping server...");
     process.exit(0);
-}
-
-process.on("SIGINT", () => gracefulShutdown("SIGINT (manual stop)"));
-process.on("SIGTERM", () => gracefulShutdown("SIGTERM (system stop)"));
+});
